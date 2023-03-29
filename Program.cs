@@ -14,8 +14,7 @@ internal abstract class Program
 
         var applications = StaticConfiguration.Applications;
         var table = new Table().Centered().Border(TableBorder.Ascii);
-        var httpClient = SetupHttpClient();
-        
+
         AnsiConsole.Live(table)
             .AutoClear(true)
             .Start(ctx =>
@@ -36,8 +35,7 @@ internal abstract class Program
                         long responseTime;
                         try
                         {
-                            (statusCode, responseTime, color) = SendRequest(httpClient, application.Url,
-                                application.ExpectedResponseCode);
+                            (statusCode, responseTime, color) = SendRequest(application.Url, application.ExpectedResponseCode);
                         }
                         catch
                         {
@@ -74,24 +72,15 @@ internal abstract class Program
         StaticConfiguration.Initialize(configuration);
     }
 
-    private static HttpClient SetupHttpClient()
+    private static (int, long, string) SendRequest (string url, int expectedResponseCode)
     {
-        HttpClient client = new();
-        client.Timeout = TimeSpan.FromSeconds(60);
-        return client;
-    }
-
-    private static (int, long, string) SendRequest (HttpClient httpClient, string url, int expectedResponseCode)
-    {
-        var stopWatch = new Stopwatch();
-        stopWatch.Start();
-        var response = httpClient.Send(new HttpRequestMessage(HttpMethod.Get, url));
-        stopWatch.Stop();
+        var (response, responseTime) = UpByteStopWatch.Execute(() => UpByteHttpClient.SendGetRequest(url));
         
         var statusCode = (int)response.StatusCode;
-        var responseTime = stopWatch.ElapsedMilliseconds;
         var color = statusCode == expectedResponseCode ? "green" : "red";
 
         return (statusCode, responseTime, color);
     }
+
+
 }
