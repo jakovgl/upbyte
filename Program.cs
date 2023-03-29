@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console;
@@ -7,37 +8,56 @@ internal abstract class Program
 {
     private static IConfiguration _configuration;
 
-    private static void Main(string[] args)
+    private static Task Main(string[] args)
     {
         ConfigureServices();
 
         var applications = StaticConfiguration.Applications;
+        var table = new Table().Centered().Border(TableBorder.Ascii);
+        var httpClient = SetupHttpClient();
         
-        Console.WriteLine(applications.Count);
-
-        var table = new Table().Centered();
-
         AnsiConsole.Live(table)
-            .AutoClear(false)
+            .AutoClear(true)
             .Start(ctx =>
             {
                 table.AddColumn("Name");
                 table.AddColumn("Url");
+                table.AddColumn("Code");
+                table.AddColumn("Response Time (ms)");
                 ctx.Refresh();
-                Thread.Sleep(1000);
 
                 while (true)
                 {
                     table.Rows.Clear();
-                    table.AddRow(GetRandomNumber().ToString(), GetRandomNumber().ToString());
+                    foreach (var application in applications)
+                    {
+                        string color;
+                        int statusCode;
+                        long responseTime;
+                        try
+                        {
+                            (statusCode, responseTime, color) = SendRequest(httpClient, application.Url,
+                                application.ExpectedResponseCode);
+                        }
+                        catch
+                        {
+                            statusCode = 500;
+                            color = "red";
+                            responseTime = 0;
+                        }
+
+                        table.AddRow(application.Name, application.Url, $"[{color}]{statusCode}[/]", responseTime.ToString());
+                    }
+                    
                     ctx.Refresh();
                     Thread.Sleep(1000);
                 }
             });
 
         Console.ReadLine();
+        return Task.CompletedTask;
     }
-    
+
     private static void ConfigureServices()
     {
         _configuration = new ConfigurationBuilder()
@@ -52,12 +72,26 @@ internal abstract class Program
         var configuration = serviceProvider.GetRequiredService<IConfiguration>();
 
         StaticConfiguration.Initialize(configuration);
-
     }
 
-    private static int GetRandomNumber()
+    private static HttpClient SetupHttpClient()
     {
-        var random = new Random();
-        return random.Next();
+        HttpClient client = new();
+        client.Timeout = TimeSpan.FromSeconds(60);
+        return client;
+    }
+
+    private static (int, long, string) SendRequest (HttpClient httpClient, string url, int expectedResponseCode)
+    {
+        var stopWatch = new Stopwatch();
+        stopWatch.Start();
+        var response = httpClient.Send(new HttpRequestMessage(HttpMethod.Get, url));
+        stopWatch.Stop();
+        
+        var statusCode = (int)response.StatusCode;
+        var responseTime = stopWatch.ElapsedMilliseconds;
+        var color = statusCode == expectedResponseCode ? "green" : "red";
+
+        return (statusCode, responseTime, color);
     }
 }
