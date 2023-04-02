@@ -4,15 +4,13 @@ namespace UpByte.Console;
 
 public static class UpByteStopWatch
 {
-    private static readonly Stopwatch Stopwatch = new();
-
     public static (T, long) Execute<T>(Func<T> function)
     {
-        Stopwatch.Reset();
-        Stopwatch.Start();
+        var stopWatch = new Stopwatch();
+        stopWatch.Start();
         var result = function();
-        Stopwatch.Stop();
+        stopWatch.Stop();
 
-        return (result, Stopwatch.ElapsedMilliseconds);
+        return (result, stopWatch.ElapsedMilliseconds);
     }
 }
