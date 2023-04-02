@@ -35,7 +35,8 @@ internal abstract class Program
                         long responseTime;
                         try
                         {
-                            (statusCode, responseTime, color) = SendRequest(application.Url, application.ExpectedResponseCode);
+                            (statusCode, responseTime, color) =
+                                SendRequest(application.Url, application.ExpectedResponseCode);
                         }
                         catch
                         {
@@ -44,9 +45,10 @@ internal abstract class Program
                             responseTime = 0;
                         }
 
-                        table.AddRow(application.Name, application.Url, $"[{color}]{statusCode}[/]", responseTime.ToString());
+                        table.AddRow(application.Name, application.Url, $"[{color}]{statusCode}[/]",
+                            responseTime.ToString());
                     }
-                    
+
                     ctx.Refresh();
                     Thread.Sleep(1000);
                 }
@@ -72,15 +74,13 @@ internal abstract class Program
         StaticConfiguration.Initialize(configuration);
     }
 
-    private static (int, long, string) SendRequest (string url, int expectedResponseCode)
+    private static (int, long, string) SendRequest(string url, int expectedResponseCode)
     {
         var (response, responseTime) = UpByteStopWatch.Execute(() => UpByteHttpClient.SendGetRequest(url));
-        
+
         var statusCode = (int)response.StatusCode;
         var color = statusCode == expectedResponseCode ? "green" : "red";
 
         return (statusCode, responseTime, color);
     }
-
-
 }
