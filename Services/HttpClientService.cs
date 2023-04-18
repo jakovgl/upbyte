@@ -2,7 +2,7 @@ namespace UpByte.Console;
 
 public class HttpClientService
 {
-    public static (int, long, string) SendRequest(string url, int expectedResponseCode)
+    public (int, long, string) SendRequest(string url, int expectedResponseCode)
     {
         var (response, responseTime) = UpByteStopWatch.Execute(() => UpByteHttpClient.SendGetRequest(url));
 

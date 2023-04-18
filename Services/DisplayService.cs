@@ -5,7 +5,14 @@ namespace UpByte.Console;
 
 public class DisplayService
 {
-    public static void Display(Config config)
+    private readonly HttpClientService _httpClientService;
+
+    public DisplayService(HttpClientService httpClientService)
+    {
+        _httpClientService = httpClientService;
+    }
+
+    public void Display(Config config)
     {
         var table = new Table().Centered().Border(TableBorder.Ascii);
 
@@ -30,7 +37,7 @@ public class DisplayService
                         try
                         {
                             (statusCode, responseTime, color) =
-                                HttpClientService.SendRequest(application.Url, application.ExpectedResponseCode);
+                                _httpClientService.SendRequest(application.Url, application.ExpectedResponseCode);
                         }
                         catch
                         {

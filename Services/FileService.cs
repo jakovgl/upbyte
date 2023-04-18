@@ -1,8 +1,8 @@
 namespace UpByte.Console;
 
-public class FileHandler
+public class FileService
 {
-    public void InitializeRootFolder()
+    public static void InitializeRootFolder()
     {
         var rootFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         if (!Directory.Exists(rootFolder))
@@ -11,12 +11,12 @@ public class FileHandler
         }
     }
 
-    public void LoadConfigFiles()
+    public static void LoadConfigFile()
     {
         
     }
     
-    public void CreateConfigFile()
+    public static void SaveConfigFile()
     {
         
     }

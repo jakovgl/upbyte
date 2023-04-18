@@ -9,7 +9,8 @@ internal abstract class Program
 
     private static Task Main(string[] args)
     {
-        ConfigureServices();
+        var serviceProvider = ConfigureServices();
+        var displayService = serviceProvider.GetRequiredService<DisplayService>();
 
         var applications = StaticConfiguration.Applications;
         var config = new Config
@@ -18,12 +19,12 @@ internal abstract class Program
             Applications = applications
         };
         
-        DisplayService.Display(config);
+        displayService.Display(config);
         
         return Task.CompletedTask;
     }
 
-    private static void ConfigureServices()
+    private static ServiceProvider ConfigureServices()
     {
         _configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
@@ -32,10 +33,15 @@ internal abstract class Program
 
         var serviceProvider = new ServiceCollection()
             .AddSingleton(_configuration)
+            .AddScoped<HttpClientService>()
+            .AddScoped<DisplayService>()
+            .AddScoped<ConfigService>()
+            .AddScoped<FileService>()
             .BuildServiceProvider();
 
         var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-
         StaticConfiguration.Initialize(configuration);
+
+        return serviceProvider;
     }
 }
