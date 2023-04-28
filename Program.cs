@@ -1,7 +1,6 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using UpByte.Console;
-using UpByte.Console.models;
 
 internal abstract class Program
 {
@@ -10,16 +9,20 @@ internal abstract class Program
     private static Task Main(string[] args)
     {
         var serviceProvider = ConfigureServices();
-        var displayService = serviceProvider.GetRequiredService<DisplayService>();
-
-        var applications = StaticConfiguration.Applications;
-        var config = new Config
-        {
-            Name = "UpByte",
-            Applications = applications
-        };
         
-        displayService.Display(config);
+        var displayService = serviceProvider.GetRequiredService<DisplayService>();
+        var configService = serviceProvider.GetRequiredService<ConfigService>();
+        var fileService = serviceProvider.GetRequiredService<FileService>();
+        
+        fileService.InitializeRootFolder();
+        
+        Console.Clear();
+        
+        var config = displayService.DisplayConfigCreateScreen();
+
+        // var config = configService.LoadDefaultConfig();
+        
+        // displayService.Display(config);
         
         return Task.CompletedTask;
     }

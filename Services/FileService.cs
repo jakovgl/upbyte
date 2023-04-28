@@ -2,7 +2,7 @@ namespace UpByte.Console;
 
 public class FileService
 {
-    public static void InitializeRootFolder()
+    public void InitializeRootFolder()
     {
         var rootFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         if (!Directory.Exists(rootFolder))
@@ -11,12 +11,12 @@ public class FileService
         }
     }
 
-    public static void LoadConfigFile()
+    public void LoadConfigFile()
     {
         
     }
     
-    public static void SaveConfigFile()
+    public void SaveConfigFile()
     {
         
     }

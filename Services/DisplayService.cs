@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Runtime.CompilerServices;
 using Spectre.Console;
 using UpByte.Console.models;
 
@@ -56,5 +58,61 @@ public class DisplayService
             });
 
         System.Console.ReadLine();
+    }
+
+    public Config DisplayConfigCreateScreen()
+    {
+        WriteDivider("Welcome to UpByte");
+        WriteDivider("Creating a new configuration");
+        
+        System.Console.WriteLine();
+
+        var configName = AskConfigurationName();
+        var applications = new List<Application>();
+        
+        var createNewApplication = true;
+
+        while (createNewApplication)
+        {
+            var application = AskApplication();
+            applications.Add(application);
+            createNewApplication = AskNewApplication();
+        }
+        
+        return new Config
+        {
+            Name = configName,
+            Applications = applications
+        };
+    }
+    
+    private static void WriteDivider(string text)
+    {
+        AnsiConsole.WriteLine();
+        AnsiConsole.Write(new Rule($"[yellow]{text}[/]").RuleStyle("grey").LeftJustified());
+    }
+    
+    private string AskConfigurationName()
+    {
+        return AnsiConsole.Ask<string>("[green]Configuration name?[/]");
+    }
+
+    private bool AskNewApplication()
+    {
+        return AnsiConsole.Confirm("Create new application?");
+    }
+
+    private Application AskApplication()
+    {
+        WriteDivider("New Application");
+        
+        var name = AnsiConsole.Ask<string>("[green]Application name:[/]");
+        var url = AnsiConsole.Ask<string>("[green]Application url:[/]");
+
+        return new Application
+        {
+            Name = name,
+            Url = url,
+        };
     }
 }
