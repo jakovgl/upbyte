@@ -2,22 +2,22 @@ namespace UpByte.Console;
 
 public class FileService
 {
-    public void InitializeRootFolder()
+    private readonly string _configFilePath =
+        Environment.GetFolderPath(Environment.SpecialFolder.UserProfile) + "/upbyte.json"; 
+    
+    public string LoadConfigFile()
     {
-        var rootFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        if (!Directory.Exists(rootFolder))
-        {
-            Directory.CreateDirectory(rootFolder);
-        }
-    }
+        if (!File.Exists(_configFilePath))
+            return null;
 
-    public void LoadConfigFile()
-    {
-        
+        using var reader = new StreamReader(_configFilePath);
+        var json = reader.ReadToEnd();
+
+        return json;
     }
     
-    public void SaveConfigFile()
+    public void SaveConfigFile(string config)
     {
-        
+        File.WriteAllText(_configFilePath, config);
     }
 }

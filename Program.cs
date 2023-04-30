@@ -12,17 +12,19 @@ internal abstract class Program
         
         var displayService = serviceProvider.GetRequiredService<DisplayService>();
         var configService = serviceProvider.GetRequiredService<ConfigService>();
-        var fileService = serviceProvider.GetRequiredService<FileService>();
-        
-        fileService.InitializeRootFolder();
         
         Console.Clear();
-        
-        var config = displayService.DisplayConfigCreateScreen();
 
-        // var config = configService.LoadDefaultConfig();
-        
-        // displayService.Display(config);
+        var config = configService.LoadConfig();
+
+        if (config == null)
+        {
+            config = displayService.DisplayConfigCreateScreen();
+            configService.SaveConfig(config);
+            Console.Clear();
+        }
+
+        displayService.Display(config);
         
         return Task.CompletedTask;
     }

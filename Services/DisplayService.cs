@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Runtime.CompilerServices;
 using Spectre.Console;
 using UpByte.Console.models;
 
@@ -16,18 +14,26 @@ public class DisplayService
 
     public void Display(Config config)
     {
-        var table = new Table().Centered().Border(TableBorder.Ascii);
+        WriteDivider("UpByte");
+
+        System.Console.WriteLine();
+        
+        var table = new Table()
+            .Centered()
+            .Border(TableBorder.Ascii)
+            .Title($"[yellow] [[[/] {config.Name} [yellow]]] [/]");
 
         AnsiConsole.Live(table)
             .AutoClear(true)
             .Start(ctx =>
             {
-                table.AddColumn("Name");
-                table.AddColumn("Url");
-                table.AddColumn("Code");
-                table.AddColumn("Response Time (ms)");
-                ctx.Refresh();
+                table.AddColumn("[yellow]Name[/]");
+                table.AddColumn("[yellow]Url[/]");
+                table.AddColumn("[yellow]Code[/]");
+                table.AddColumn("[yellow]Response Time (ms)[/]");
 
+                ctx.Refresh();
+                
                 while (true)
                 {
                     table.Rows.Clear();
@@ -36,6 +42,7 @@ public class DisplayService
                         string color;
                         int statusCode;
                         long responseTime;
+                        
                         try
                         {
                             (statusCode, responseTime, color) =
@@ -48,8 +55,8 @@ public class DisplayService
                             responseTime = 0;
                         }
 
-                        table.AddRow(application.Name, application.Url, $"[{color}]{statusCode}[/]",
-                            responseTime.ToString());
+                        table.AddRow($"[{color}]{application.Name}[/]", $"[{color}]{application.Url}[/]",
+                            $"[{color}]{statusCode}[/]", responseTime.ToString());
                     }
 
                     ctx.Refresh();
@@ -88,13 +95,12 @@ public class DisplayService
     
     private static void WriteDivider(string text)
     {
-        AnsiConsole.WriteLine();
         AnsiConsole.Write(new Rule($"[yellow]{text}[/]").RuleStyle("grey").LeftJustified());
     }
     
     private string AskConfigurationName()
     {
-        return AnsiConsole.Ask<string>("[green]Configuration name?[/]");
+        return AnsiConsole.Ask<string>("[silver]Configuration name?[/]");
     }
 
     private bool AskNewApplication()
@@ -106,13 +112,19 @@ public class DisplayService
     {
         WriteDivider("New Application");
         
-        var name = AnsiConsole.Ask<string>("[green]Application name:[/]");
-        var url = AnsiConsole.Ask<string>("[green]Application url:[/]");
+        var name = AnsiConsole.Ask<string>("[silver]Application name:[/]");
+        
+        var url = AnsiConsole.Ask<string>("[silver]Application url:[/]");
+        if (!url.StartsWith("http://") && !url.StartsWith("https://"))
+            url = $"https://{url}";
+        
+        var expectedResponseCode = AnsiConsole.Ask<string>("[silver]Expected response code:[/]");
 
         return new Application
         {
             Name = name,
             Url = url,
+            ExpectedResponseCode = int.Parse(expectedResponseCode)
         };
     }
 }
