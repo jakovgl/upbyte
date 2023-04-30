@@ -24,9 +24,13 @@ internal abstract class Program
             Console.Clear();
         }
 
-        displayService.Display(config);
-        
-        return Task.CompletedTask;
+        do
+        {
+            displayService.Display(config);
+            config = displayService.DisplayConfigCreateScreen();
+            configService.SaveConfig(config);
+            Console.Clear();
+        } while (true);
     }
 
     private static ServiceProvider ConfigureServices()

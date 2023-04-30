@@ -36,6 +36,11 @@ public class DisplayService
                 
                 while (true)
                 {
+                    if (System.Console.KeyAvailable && System.Console.ReadKey(true).Key == ConsoleKey.F1)
+                    {
+                        break;
+                    }
+                    
                     table.Rows.Clear();
                     foreach (var application in config.Applications)
                     {
@@ -63,8 +68,6 @@ public class DisplayService
                     Thread.Sleep(1000);
                 }
             });
-
-        System.Console.ReadLine();
     }
 
     public Config DisplayConfigCreateScreen()
