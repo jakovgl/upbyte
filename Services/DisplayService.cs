@@ -17,11 +17,12 @@ public class DisplayService
         WriteDivider("UpByte");
 
         System.Console.WriteLine();
-        
+
         var table = new Table()
             .Centered()
             .Border(TableBorder.Ascii)
-            .Title($"[yellow] [[[/] {config.Name} [yellow]]] [/]");
+            .Title($"[yellow] [[[/] {config.Name} [yellow]]] [/]")
+            .Caption("Press F1 to create new configuration");
 
         AnsiConsole.Live(table)
             .AutoClear(true)
@@ -121,13 +122,15 @@ public class DisplayService
         if (!url.StartsWith("http://") && !url.StartsWith("https://"))
             url = $"https://{url}";
         
-        var expectedResponseCode = AnsiConsole.Ask<string>("[silver]Expected response code:[/]");
+        var expectedResponseCode = AnsiConsole.Ask<string>("[silver]Expected response code(number):[/]");
 
+        var succeeded = int.TryParse(expectedResponseCode, out var responseCode);
+        
         return new Application
         {
             Name = name,
             Url = url,
-            ExpectedResponseCode = int.Parse(expectedResponseCode)
+            ExpectedResponseCode = succeeded ? responseCode : 200
         };
     }
 }
