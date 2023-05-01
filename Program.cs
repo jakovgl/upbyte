@@ -37,7 +37,6 @@ internal abstract class Program
     {
         _configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .Build();
 
         var serviceProvider = new ServiceCollection()
@@ -47,9 +46,6 @@ internal abstract class Program
             .AddScoped<ConfigService>()
             .AddScoped<FileService>()
             .BuildServiceProvider();
-
-        var configuration = serviceProvider.GetRequiredService<IConfiguration>();
-        StaticConfiguration.Initialize(configuration);
 
         return serviceProvider;
     }
